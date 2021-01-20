@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" th:src="@{/js/axios-0.18.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.11.3.min.js}"></script>
+</head>
+<body>
+    <form th:action="@{/student/AddCon}"method="post" id="pm">
+       姓名：<input type="text" name="name" required id="name" th:onblur="na()"><span style="color: red" id="names"></span><br>
+        年龄：<input type="text" name="age" readonly id="age" th:onblur="ag()"><span style="color: red" id="ages"></span><br>
+       性别：
+        <input type="radio" name="sex" id="sex" value="1"/>男
+        <input type="radio" name="sex" id="sex1" value="2"/>女<br>
+       当前日期：<input type="date" id="dad" th:value="${#dates.format(dad,'yyyy-MM-dd')}" readonly/><br>
+       出生日期：<input type="date" name="birthday" id="birthday" th:onchange="agaa()" required/><br>
+       地址：
+        省：
+        <select name="shengid" id="yi" th:onchange="yii()" required>
+            <option value="">请选择</option>
+            <span th:each="li:${list}">
+                <option  th:value="${li.sid}" th:text="${li.aname}"></option>
+            </span>
+        </select>
+        市：<select name="shiid" id="er" th:onchange="err()" required>
+           <option value="">请选择</option>
+         </select>
+        县：<select name="xianid" id="san" required>
+        <option value="">请选择</option>
+    </select><br>
+        详细地址：<input type="text" name="juti" id="juti" th:onblur="ju()"><span style="color: red" id="jutis"></span><br>
+        <input th:type="button" onclick="fun3()" th:value="添加">
+        <!--<input type="button" th:onclick="'javascript:sum()'" value="添加">-->
+        <input type="reset" value="重置">
+    </form>
+</body>
+<script type="text/javascript">
+
+    /*计算年龄*/
+    function agaa()
+    {
+        var strBirthday = document.getElementById("birthday").value;
+        var returnAge;
+        var strBirthdayArr=strBirthday.split("-");
+        var birthYear = strBirthdayArr[0];
+        var birthMonth = strBirthdayArr[1];
+        var birthDay = strBirthdayArr[2];
+
+        d = new Date();
+        var nowYear = d.getFullYear();
+        var nowMonth = d.getMonth() + 1;
+        var nowDay = d.getDate();
+
+        /*如果今年==*/
+        if(nowYear == birthYear){
+            returnAge = 0;//同年 则为0岁
+            if (birthMonth>nowMonth){
+                returnAge= -1;
+            }
+            if (birthDay>nowDay){
+                returnAge=-1;
+            }
+        }
+        else{
+            var ageDiff = nowYear - birthYear ; //年之差
+            if(ageDiff > 0){
+                if(nowMonth == birthMonth) {
+                    var dayDiff = nowDay - birthDay;//日之差
+                    if(dayDiff < 0)
+                    {
+                        returnAge = ageDiff - 1;
+                    }
+                    else
+                    {
+                        returnAge = ageDiff ;
+                    }
+                }
+                else
+                {
+                    var monthDiff = nowMonth - birthMonth;//月之差
+                    if(monthDiff < 0)
+                    {
+                        returnAge = ageDiff - 1;
+                    }
+                    else
+                    {
+                        returnAge = ageDiff ;
+                    }
+                }
+            }
+            else
+            {
+                returnAge = -1;//返回-1 表示出生日期输入错误 晚于今天
+            }
+        }
+
+        if (returnAge==-1){
+            $("#age").val("");
+            alert("日期选择错误");
+            $("#birthday").val("");
+        }else {
+            $("#age").val("");
+            $("#age").val(returnAge);
+        }
+
+        // return returnAge;//返回周岁年龄
+       /* return returnAge;//返回周岁年龄*/
+
+     /*   var day = 24 * 60 * 60 *1000;
+
+        var startDateStr = document.getElementById("birthday").value;
+        var endDateStr = document.getElementById("dad").value;
+        
+        alert(startDateStr)
+        alert(endDateStr)
+        var sDate = new Date(Date.parse(startDateStr.replace(/-/g, "/")));
+        var eDate = new Date(Date.parse(endDateStr.replace(/-/g, "/")));
+        sDate = new Date(sDate.getTime() - day);
+        //获得各自的年、月、日
+        var sY  = sDate.getFullYear();
+        var sM  = sDate.getMonth()+1;
+        var sD  = sDate.getDate();
+        var eY  = eDate.getFullYear();
+        var eM  = eDate.getMonth()+1;
+        var eD  = eDate.getDate();
+
+
+
+
+        if(eY > sY && sM == eM && sD == eD) {
+            alert(eY-sY)
+/!*            return eY - sY;*!/
+        } else {
+            alert("两个日期之间并非整年，请重新选择");
+            return 0;
+        }*/
+
+    }
+
+    function na(){
+        var name = document.getElementById("name").value;
+        if (name==null || name==''){
+            document.getElementById("names").innerHTML = "姓名不能为空";
+        }
+    }
+    function ag(){
+        var age = document.getElementById("age").value;
+        if (age==null || age==''){
+            document.getElementById("ages").innerHTML = "请选择出生日期";
+        }
+    }
+    function  ju(){
+        var juti = document.getElementById("juti").value;
+        if (juti==null || juti==''){
+            document.getElementById("jutis").innerHTML = "详细地址不能为空";
+        }
+    }
+
+
+
+    function fun3(){
+        var sex = document.getElementById("sex").checked;
+        var sex1 = document.getElementById("sex1").checked;
+        var name = document.getElementById("name").value;
+        var age = document.getElementById("age").value;
+        var birthday = document.getElementById("birthday").value;
+        var yi = document.getElementById("yi").value;
+        var er = document.getElementById("er").value;
+        var san = document.getElementById("san").value;
+        var juti = document.getElementById("juti").value;
+
+        if (sex || sex1){
+            if (name==null || name==''){
+                alert("姓名不能为空");
+            }else if(age==null || age==''){
+                alert("年龄不能为空");
+            }else if(birthday==null || birthday==''){
+                alert("生日不能为空");
+            }else if(yi==null || yi==''){
+                alert("省级不能为空");
+            }else if(er==null || er==''){
+                alert("市级不能为空");
+            }else if(san==null || san==''){
+                alert("区级不能为空");
+            }else if(juti==null || juti==''){
+                alert("具体地址不能为空");
+            }else {
+                var sexs=$("[name=sex]:checked").val();
+                var para={"name":name,"age":age,"birthday":birthday,"shengid":yi,"shiid":er,"xianid":san,"sex":sexs,"juti":juti};
+                $.ajax({
+                    type:"post",
+                    url:"/student/AddCon",
+                    contentType:"application/json",
+                    data:JSON.stringify(para),
+                    success:function (data) {
+                        if (data=="1"){
+                            alert("添加成功");
+                            location.href="/student/tui";
+                        }else {
+                            alert("添加失败");
+                            location.href="/student/tui";
+                        }
+                    }
+                })
+                /*document.getElementById("pm").action="/student/AddCon";
+                document.getElementById("pm").submit();*/
+            }
+        }else {
+            alert("请填写性别");
+        }
+    }
+
+    function err() {
+        $("#san").empty();
+        var aid = $("#er").val();
+        $.ajax({
+            type:"post",
+            url:"/student/erji",
+            data:{"aid":aid},
+            success:function (data) {
+                $("#san").append("<option value=''>请选择</option>");
+                var all = eval(data);
+                for (i=0;i<all.length;i++){
+                    $("#san").append("<option value='"+all[i].sid+"'>"+all[i].aname+"</option>")
+                }
+            }
+        })
+    }
+    function yii() {
+        $("#er").empty();
+        var aid = $("#yi").val();
+        $.ajax({
+            type:"post",
+            url:"/student/erji",
+            data:{"aid":aid},
+            success:function (data) {
+                $("#er").append("<option value=''>请选择</option>");
+                var all = eval(data);
+                for (i=0;i<all.length;i++){
+                    $("#er").append("<option value='"+all[i].sid+"'>"+all[i].aname+"</option>")
+                }
+            }
+        })
+        $("#san").empty();
+        $("#san").append("<option value=''>请选择</option>");
+    }
+</script>
+
+</html>

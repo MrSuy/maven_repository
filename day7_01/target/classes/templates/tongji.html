@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" th:src="@{/js/echarts.js}"></script>
+    <script type="text/javascript" th:src="@{/js/axios-0.18.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.11.3.min.js}"></script>
+</head>
+<body>
+    <input type="hidden" th:value="${n}" id="n">
+    <input type="hidden" th:value="${s}" id="s">
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <input type="button" th:onclick="'javascript:toDel()'" value="退出">
+</body>
+<script>
+    function toDel(){
+        if (confirm("是否确认退出")){
+            location.href="/student/tui";
+        }
+    }
+</script>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var nan=document.getElementById("n").value;
+    var nv=document.getElementById("s").value;
+    var myChart = echarts.init(document.getElementById('main'));
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: '男女统计'
+        },
+        tooltip: {},
+        legend: {
+            data:['统计']
+        },
+        xAxis: {
+            data: ["男","女"]
+        },
+        yAxis: {},
+        series: [{
+            name: '销量',
+            type: 'bar',
+            data: [nan, nv]
+        }]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</html>

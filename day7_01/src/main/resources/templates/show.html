@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" th:src="@{/js/WdatePicker.js}"></script>
+</head>
+<script type="text/javascript">
+    function toAdd(){
+        location.href="/student/toAdd";
+    }
+
+    function toDel(id){
+        if (confirm("是否确认删除?")){
+            location.href="/student/toDel?id="+id;
+        }
+    }
+[]
+    function toUpda(id){
+        location.href="/student/toUpda?id="+id;
+    }
+
+    /*去统计页码*/
+    function tongji(){
+        location.href="/student/Tongji";
+    }
+    function findAll(){
+        location.href="/student/findPage";
+    }
+</script>
+<body>
+
+<!--th:class="Wdate" th:onfocus="WdatePicker()"-->
+<form th:action="@{/student/findPage}"  method="post" id="pm">
+    <input th:type="text" th:placeholder="查询" th:name="name" th:value="${name}"><br>
+    <input type="date" name="birthday" th:placeholder="手机自己想查的日期" th:value="${#dates.format(birthday,'yyyy-MM-dd')}"/>
+    <input type="text" name="addres" th:value="${addres}" th:placeholder="地址"><br>
+    <!--<input type="submit" value="查询">-->
+    <input th:type="button" onclick="fun12()" th:value="查询">
+    <input type="reset" value="重置">
+    <input type="button" th:onclick="'javascript:toAdd()'" value="添加">
+   <!-- <input type="button" th:onclick="'javascript:findAll()'" value="查询">-->
+
+<table>
+    <tr>
+        <td>id</td>
+        <td>姓名</td>
+        <td>性别</td>
+        <td>年龄</td>
+        <td>生日</td>
+        <td>省</td>
+        <td>市</td>
+        <td>县</td>
+        <td>小区</td>
+        <td>操作</td>
+    </tr>
+    <tr th:each="u:${list}">
+        <td th:text="${u.id}"></td>
+        <td th:text="${u.name}"></td>
+        <td>
+              <span th:if="${u.sex}=='1'">
+                  男
+              </span>
+            <span th:if="${u.sex}=='2'">
+                  女
+              </span>
+        </td>
+        <td th:text="${u.age}"></td>
+        <td>
+            <span th:text="${#dates.format(u.birthday,'yyyy-MM-dd')}"></span>
+        </td>
+        <td th:text="${u.sheng}"></td>
+        <td th:text="${u.shi}"></td>
+        <td th:text="${u.xian}"></td>
+        <td th:text="${u.juti}"></td>
+        <td>
+            <input type="button" th:onclick="'javascript:toUpda('+${u.id}+')'" value="修改">
+            <input type="button" th:onclick="'javascript:toDel('+${u.id}+')'" value="删除">
+        </td>
+    </tr>
+</table>
+<!--当前页：<span th:text="${pageNum}" id="pag"></span>-->
+<!--总页数：<span th:text="${total}" id="total"></span>-->
+    <input type="hidden" th:value="${pageNum}" name="pageNums" id="pag">
+    <input type="hidden" th:value="${total}" id="total">
+    <input type="hidden" id="pn">
+<input th:type="text" id="pages" th:placeholder="请输入您要找的页码">
+<input th:type="button" onclick="fun4()" th:value="跳转"><br>
+<input type="button" th:onclick="'javascript:tongji()'" value="统计"><br>
+<!--<div>
+
+      首页：<input th:type="button" onclick="fun()" th:value="首页">
+      上一页：<input th:type="button" onclick="fun1()" th:value="上一页">
+      下一页：<input th:type="button" onclick="fun2()" th:value="下一页">
+      尾页：<input th:type="button" onclick="fun3()" th:value="尾页">
+</div>-->
+ 当前<span th:text="${page.getNumber()} + 1"></span>页,总<span th:text="${page.totalPages}"  th:id="oo"></span>页,共<span th:text="${page.totalElements}"></span>条记录<br>
+    <!--<a th:href="@{/student/findPage}">首页</a>-->
+    <input th:type="button" onclick="fun()" th:value="首页">
+   <!-- <a th:href="@{/student/findPage(pageNums = ${page.hasPrevious()} ? ${page.getNumber() } : 1)}">上一页</a>-->
+    <input th:type="button" onclick="fun1()" th:value="上一页">
+    <input th:type="button" onclick="fun2()" th:value="下一页">
+<!--    <a th:href="@{/student/findPage(pageNums = ${page.hasNext()} ? ${page.getNumber()} + 1 : ${page.totalPages})}">下一页</a>-->
+ <!--   <a th:href="@{/student/findPage(pageNums = ${page.totalPages}-1)}">尾页</a></p>-->
+    <input th:type="button" onclick="fun3()" th:value="尾页">
+</form>
+</body>
+<script type="text/javascript">
+    function fun12(){
+        document.getElementById("pag").value=0;
+        document.getElementById("pm").action="/student/findPage";
+        document.getElementById("pm").submit();
+    }
+
+    function fun4(){
+        /*当前页*/
+        var elementById = document.getElementById("pag").value;
+        /*总页数*/
+        var total = document.getElementById("total").value;
+        /*手写的*/
+        var page = document.getElementById("pages").value;
+        var pages=page-1;
+       /* 1<5 and 1>=3*/
+        if (pages<total && pages>=0){
+            document.getElementById("pag").value=pages;
+            document.getElementById("pm").action="/student/findPage";
+            document.getElementById("pm").submit();
+       /*     location.href="/student/findPage?pageNums="+pages;*/
+        }else {
+            alert("请写范围内的页码");
+        }
+    }
+
+    function fun3(){
+        var elementById = document.getElementById("total").value;
+     /*   var total = document.getElementById("total").value;*/
+
+        var  elementByIds= parseInt(elementById)-1;
+ /*       location.href="/student/findPage?pageNums="+elementById;*/
+
+
+        document.getElementById("pag").value=elementByIds;
+        document.getElementById("pm").action="/student/findPage";
+        document.getElementById("pm").submit();
+
+    }
+
+
+    function fun2(){
+        var elementById1 = document.getElementById("pag").value;
+        var count=1;
+        /*当前页加1*/
+        var  elementByIds= parseInt(elementById1)+count;
+/*        var elementByIds=elementById1+count;*/
+        /*总页数*/
+        var total = document.getElementById("total").value;
+        if (elementByIds>(total-1)){
+            alert("已经是尾页了");
+        }else {
+            document.getElementById("pag").value=elementByIds;
+            document.getElementById("pm").action="/student/findPage";
+            document.getElementById("pm").submit();
+
+         /*   location.href="/student/findPage?pageNums="+elementByIds;*/
+        }
+
+    }
+    function fun1(){
+        var elementById1 = document.getElementById("pag").value;
+        var elementById=elementById1-1;
+        if (elementById<0){
+            alert("已经是首页了");
+        }else {
+            document.getElementById("pag").value=elementById;
+            document.getElementById("pm").action="/student/findPage";
+            document.getElementById("pm").submit();
+          /*  location.href="/student/findPage?pageNums="+elementById;*/
+        }
+
+    }
+    function fun(){
+        var elementById = document.getElementById("pag").value;
+        elementById=0;
+        document.getElementById("pag").value=elementById;
+        document.getElementById("pm").action="/student/findPage";
+        document.getElementById("pm").submit();
+ /*       location.href="/student/findPage?pageNums="+elementById;*/
+    }
+
+
+</script>
+</html>

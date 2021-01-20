@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" th:src="@{/js/axios-0.18.0.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.11.3.min.js}"></script>
+
+</head>
+<body>
+<form th:action="@{/student/UpdaCon}"method="post">
+        <input type="hidden" name="id" id="id" th:value="${student.id}">
+        姓名：<input type="text" name="name" id="name" th:value="${student.name}" required th:onblur="na()"><span style="color: red" id="names"></span><br>
+        年龄：<input type="text" name="age" id="age" th:value="${student.age}" readonly th:onblur="ag()"><span style="color: red" id="ages"></span><br>
+        性别：
+        <input type="radio" name="sex" id="sex" value="1" th:checked="${student.sex}==1" required/>男
+        <input type="radio" name="sex" id="sex1" value="2" th:checked="${student.sex}==2" required/>女<br>
+        当前日期：<input type="date" id="dad" th:value="${#dates.format(dad,'yyyy-MM-dd')}" readonly/><br>
+        出生日期：<input type="date" name="birthday" id="birthday" th:value="${#dates.format(student.birthday,'yyyy-MM-dd')}" th:onchange="agaa()" required/><br>
+        地址：
+        省：
+        <select name="shengid" id="yi" th:onchange="yii()" required>
+            <option th:value="${student.shengid}" th:text="${student.sheng}"></option>
+<!--            if (ids == all[i].sid) {-->
+<!--            $("#yi").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")-->
+<!--            }-->
+            <span th:each="li:${list}">
+                <option th:if="${student.shengid} != ${li.sid}"  th:value="${li.sid}" th:text="${li.aname}"></option>
+            </span>
+        </select>
+        <input type="hidden" id="idss" th:value="${student.shengid}">
+        市：<select name="shiid" id="er" required th:onchange="err()">
+        <option th:value="${student.shiid}" th:text="${student.shi}"></option>
+    </select>
+     <input type="hidden" id="shiids" th:value="${student.shiid}">
+        县：<select name="xianid" id="san" required>
+        <option th:value="${student.xianid}" th:text="${student.xian}"></option>
+    </select><br>
+    <input type="hidden" id="sans" th:value="${student.xianid}">
+    详细地址：<input type="text" name="juti" id="juti" th:value="${student.juti}" required th:onblur="ju()"><span style="color: red" id="jutis"></span><br>
+    <input th:type="button" onclick="fun3()" th:value="修改">
+          <!--  <input type="submit" value="修改">-->
+        <input type="reset" value="重置">
+    </form>
+</body>
+<script type="text/javascript">
+
+    {
+    /*   var idss=$("#idss").val;
+       var shiid=$("#shiids").val;
+       var xianid=$("#sans").val;
+       alert(xianid)*/
+       var cou=1;
+       yii();
+       err();
+       /*if (cou==2){
+           err();
+       }*/
+    }
+
+    function agaa()
+    {
+        var strBirthday = document.getElementById("birthday").value;
+        var returnAge;
+        var strBirthdayArr=strBirthday.split("-");
+        var birthYear = strBirthdayArr[0];
+        var birthMonth = strBirthdayArr[1];
+        var birthDay = strBirthdayArr[2];
+
+        d = new Date();
+        var nowYear = d.getFullYear();
+        var nowMonth = d.getMonth() + 1;
+        var nowDay = d.getDate();
+
+
+        /*如果今年==*/
+        if(nowYear == birthYear){
+            returnAge = 0;//同年 则为0岁
+            if (birthMonth>nowMonth){
+                returnAge= -1;
+            }
+            if (birthDay>nowDay){
+                returnAge=-1;
+            }
+        }
+        else{
+            var ageDiff = nowYear - birthYear ; //年之差
+            if(ageDiff > 0){
+                if(nowMonth == birthMonth) {
+                    var dayDiff = nowDay - birthDay;//日之差
+                    if(dayDiff < 0)
+                    {
+                        returnAge = ageDiff - 1;
+                    }
+                    else
+                    {
+                        returnAge = ageDiff ;
+                    }
+                }
+                else
+                {
+                    var monthDiff = nowMonth - birthMonth;//月之差
+                    if(monthDiff < 0)
+                    {
+                        returnAge = ageDiff - 1;
+                    }
+                    else
+                    {
+                        returnAge = ageDiff ;
+                    }
+                }
+            }
+            else
+            {
+                returnAge = -1;//返回-1 表示出生日期输入错误 晚于今天
+            }
+        }
+
+        if (returnAge==-1){
+            $("#age").val("");
+            alert("日期选择错误");
+            $("#birthday").val("");
+        }else {
+            $("#age").val("");
+            $("#age").val(returnAge);
+        }
+
+        // return returnAge;//返回周岁年龄
+        /* return returnAge;//返回周岁年龄*/
+
+        /*   var day = 24 * 60 * 60 *1000;
+
+           var startDateStr = document.getElementById("birthday").value;
+           var endDateStr = document.getElementById("dad").value;
+
+           alert(startDateStr)
+           alert(endDateStr)
+           var sDate = new Date(Date.parse(startDateStr.replace(/-/g, "/")));
+           var eDate = new Date(Date.parse(endDateStr.replace(/-/g, "/")));
+           sDate = new Date(sDate.getTime() - day);
+           //获得各自的年、月、日
+           var sY  = sDate.getFullYear();
+           var sM  = sDate.getMonth()+1;
+           var sD  = sDate.getDate();
+           var eY  = eDate.getFullYear();
+           var eM  = eDate.getMonth()+1;
+           var eD  = eDate.getDate();
+
+
+
+
+           if(eY > sY && sM == eM && sD == eD) {
+               alert(eY-sY)
+   /!*            return eY - sY;*!/
+           } else {
+               alert("两个日期之间并非整年，请重新选择");
+               return 0;
+           }*/
+
+    }
+
+        function na() {
+            var name = document.getElementById("name").value;
+            if (name == null || name == '') {
+                document.getElementById("names").innerHTML = "姓名不能为空";
+            }else {
+                document.getElementById("names").innerHTML = "√";
+            }
+        }
+
+        function ag() {
+            var age = document.getElementById("age").value;
+            if (age == null || age == '') {
+                document.getElementById("ages").innerHTML = "年龄不能为空";
+            }else {
+                document.getElementById("ages").innerHTML = "√";
+            }
+        }
+
+        function ju() {
+            var juti = document.getElementById("juti").value;
+            if (juti == null || juti == '') {
+                document.getElementById("jutis").innerHTML = "详细地址不能为空";
+            }else {
+                document.getElementById("jutis").innerHTML = "√";
+            }
+        }
+
+        function fun3() {
+            var id = document.getElementById("id").value;
+            var sex = document.getElementById("sex").checked;
+            var sex1 = document.getElementById("sex1").checked;
+            var name = document.getElementById("name").value;
+            var age = document.getElementById("age").value;
+            var birthday = document.getElementById("birthday").value;
+            var yi = document.getElementById("yi").value;
+            var er = document.getElementById("er").value;
+            var san = document.getElementById("san").value;
+            var juti = document.getElementById("juti").value;
+
+            if (sex || sex1) {
+                if (name == null || name == '') {
+                    alert("姓名不能为空");
+                } else if (age == null || age == '') {
+                    alert("年龄不能为空");
+                } else if (birthday == null || birthday == '') {
+                    alert("生日不能为空");
+                } else if (yi == null || yi == '') {
+                    alert("省级不能为空");
+                } else if (er == null || er == '') {
+                    alert("市级不能为空");
+                } else if (san == null || san == '') {
+                    alert("区级不能为空");
+                } else if (juti == null || juti == '') {
+                    alert("具体地址不能为空");
+                } else {
+                    var sexs = $("[name=sex]:checked").val();
+                    var para = {
+                        "id": id,
+                        "name": name,
+                        "age": age,
+                        "birthday": birthday,
+                        "shengid": yi,
+                        "shiid": er,
+                        "xianid": san,
+                        "sex": sexs,
+                        "juti": juti
+                    };
+                    $.ajax({
+                        type: "post",
+                        url: "/student/UpdaCon",
+                        contentType: "application/json",
+                        data: JSON.stringify(para),
+                        success: function (data) {
+                            if (data == "1") {
+                                alert("修改成功");
+                                location.href = "/student/tui";
+                            } else {
+                                alert("修改失败");
+                                location.href = "/student/tui";
+                            }
+                        }
+                    })
+
+                    /*document.getElementById("pm").action="/student/AddCon";
+                document.getElementById("pm").submit();*/
+                }
+            } else {
+                alert("请填写性别");
+            }
+
+        }
+
+        function err() {
+        if (cou!=1){
+            $("#san").empty();
+        }
+         cou=2;
+            var aid = $("#er").val();
+            var quid = $("#sans").val();
+            $.ajax({
+                type: "post",
+                url: "/student/erji",
+                data: {"aid": aid},
+                success: function (data) {
+                    if (cou!=1){
+                       /* $("#san").append("<option value=''>请选择</option>");*/
+                    }
+                    var all = eval(data);
+                    for (i = 0; i < all.length; i++) {
+                        if (quid != all[i].sid) {
+                            $("#san").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")
+                        }
+                      /*  $("#san").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")*/
+                    }
+                }
+            })
+        }
+
+        function yii() {
+        if (cou!=1){
+            $("#er").empty();
+        }
+            var ids = $("#idss").val();
+            var aid = $("#yi").val();
+            var shiid = $("#shiids").val();
+
+            $.ajax({
+                type: "post",
+                url: "/student/erji",
+                data: {"aid": aid},
+                success: function (data) {
+                    if (cou!=1){
+                        /*$("#er").append("<option value=''>请选择</option>");*/
+                    }
+                    var all = eval(data);
+                    for (i = 0; i < all.length; i++) {
+                        if (shiid != all[i].sid) {
+                            $("#er").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")
+                        }
+                     /*   if (shiid==all[i].sid){
+                            $("#er").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")
+                        }*/
+                       /* $("#er").append("<option value='" + all[i].sid + "'>" + all[i].aname + "</option>")*/
+                    }
+                    if (cou==2){
+                        err();
+                    }
+                   /* err();*/
+                }
+            })
+         /*   if (cou!=1){
+                /!*$("#san").empty();*!/
+               /!* $("#san").append("<option value=''>请选择</option>");*!/
+                /!*err();*!/
+            }*/
+        }
+</script>
+</html>
